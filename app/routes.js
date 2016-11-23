@@ -27,7 +27,7 @@ function getCityId() {
         
 };
 function getWeather(cityId) {
-    https.get("https://www.metaweather.com/api/location/2357024", function (resp) {
+    https.get("https://www.metaweather.com/api/location/2357024/", function (resp) {
         var bodyw = ''; // Will contain the final response
             var bodynew = '';
             // Received data is a buffer.
