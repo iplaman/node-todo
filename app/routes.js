@@ -1,15 +1,56 @@
 var Todo = require('./models/todo');
+var https = require('https');
+var https = require('https');
 
-function getTodos(res) {
-    Todo.find(function (err, todos) {
+function getCityId() {
+    https.get("https://www.metaweather.com/api/location/search/?query=atlanta", function (res) {
+        var body = ''; // Will contain the final response
+            // Received data is a buffer.
+            // Adding it to our body
+            res.on('data', function (data) {
+                body += data;
+            });
+            // After the response is completed, parse it and log it to the console
+            res.on('end', function () {
+                var parsed = JSON.parse(body);
+                console.log("getCityId-"+parsed[0].woeid+"----");
+                weather = getWeather(parsed[0].woeid);
+                console.log(weather)
+                return weather
+            });
 
-        // if there is an error retrieving, send the error. nothing after res.send(err) will execute
-        if (err) {
-            res.send(err);
-        }
+        })
+            // If any error has occured, log error to console
+            .on('error', function (e) {
+                console.log("Got error: " + e.message);
+            });
+        
+};
+function getWeather(cityId) {
+    https.get("https://www.metaweather.com/api/location/2357024", function (resp) {
+        var bodyw = ''; // Will contain the final response
+            var bodynew = '';
+            // Received data is a buffer.
 
-        res.json(todos); // return all todos in JSON format
-    });
+            // Adding it to our body
+            resp.on('data', function (data) {
+                bodyw += data;
+                console.log("in getWeather")
+            });
+            // After the response is completed, parse it and log it to the console
+            resp.on('end', function (body) {
+                console.log("getWeather"+body);
+                console.log("getWeather"+bodynew);
+                console.log("getWeather"+bodyw);
+                // var parsed = JSON.parse(body);
+                return bodyw;
+            });
+
+        })
+            // If any error has occured, log error to console
+            .on('error', function (e) {
+                console.log("Got error: " + e.message);
+            });
 };
 
 module.exports = function (app) {
@@ -17,8 +58,15 @@ module.exports = function (app) {
     // api ---------------------------------------------------------------------
     // get all todos
     app.get('/api/todos', function (req, res) {
-        // use mongoose to get all todos in the database
-        getTodos(res);
+        
+        // city_id = getCityId();
+
+        
+        weather = getCityId(); 
+        console.log(weather)
+        res.send(weather)
+        
+
     });
 
     // create todo and send back all todos after creation
